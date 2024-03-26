@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sterowanie serwomechanizmem</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- <button onclick="sendCommand('readServo')">Odczytaj servo</button>
+    <button onclick="readServoFromTxt()">Wypisz servo</button> -->
+    
+    <!-- <iframe src="http://192.168.0.17/info.txt" height="50px" width="50px" id="mojIframe"></iframe> -->
+
+        <div id="container">
+            <div id="header">
+                <h1>Rover Driver 2.0</h1>
+            </div>
+            <div id="main">
+                <div id="left">
+                    <div id="turret_camera_preview">
+                        <img id="capturedPhoto" alt="Zdjęcie z kamery" src="menewr1.jpg" onclick="openPhotoVis()">
+                        <button type="button" onclick="capturePhoto(); startTimer()">Take a photo</button>
+                        <div id="progress-bar">
+                            <div id="progress"></div>
+                        </div>
+                        <input type="checkbox" id="ledCheckbox">
+                        <button onclick="buzzer('pik')">Pik</button>
+                        <button onclick="buzzer('tune')">Tune</button>
+                    </div>
+                    
+                    <div id="rover-rotation">
+                        <img src="rover-front.png" id="rover-front">
+                        <img src="rover-rear.png" id="rover-rear">
+                    </div>
+                    <button id="update_rot_preview" onclick="updateTurnPreview()">Update preview</button>
+                </div>
+                <div id="center">
+                        <div id="turret_control">
+                            <div id="sliders">               
+                                <input type="range" id="servoPosition2" name="servoPosition2" min="0" max="180" step="1" value="90" required><br>
+                                <input type="range" id="servoPosition" name="servoPosition" min="0" max="180" step="1" value="90" required><br>
+                            </div>
+                            <div id="turret_control_buttons">
+                                <button type="button" id="turret_submit" onclick="moveServos()">Submit</button><br>
+                                <div id="turret_presets">
+                                    <button type="button" onclick="moveServosToAngle(66, 55)">Left</button>
+                                    <button type="button" onclick="moveServosToAngle(109, 54)">Center</button>
+                                    <button type="button" onclick="moveServosToAngle(155, 59)">Right</button>
+                                    <button type="button" onclick="centralizeCamera()">Centralize</button>
+                                    <p id="result-p"></p>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div id="acceleration-display">
+                            <h3>Przyspieszenie:</h3>
+                            <p id="acceleration-values">X=0.000, Y=0.000, Z=0.000</p>
+                            <button id="readAccButton">Odczytaj dane z Acc</button>
+                        </div>
+
+                    <div id="steering">
+                        <div id="steering-multiplier-div">
+                            <button class="multiplier" onclick="sendCommand('setMultiplier:0.1')">0.1</button>
+                            <button class="multiplier" onclick="sendCommand('setMultiplier:0.25')">0.25</button>
+                            <button class="multiplier" onclick="sendCommand('setMultiplier:0.5')">0.5</button>
+                            <button class="multiplier" onclick="sendCommand('setMultiplier:0.75')">0.75</button>
+                        </div>
+                        <div id="steering-grid">
+                            <button class="steering-button" onclick="giveOrder('left'); turnLeft()">Left small</button>
+                            <button class="steering-button" onclick="giveOrder('left-full'); turnLeftFull()">Left big</button>
+                            <button class="steering-button" onclick="giveOrder('forward')">Forward</button>
+                            <button class="steering-button" onclick="giveOrder('backward')">Backward</button>
+                            <button class="steering-button" onclick="giveOrder('right'); turnRight()">Right small</button>
+                            <button class="steering-button" onclick="giveOrder('right-full'); turnRightFull()">Right big</button>
+                        </div>
+                        
+                    </div>
+                    <button id="sync_servo" onclick="servo_angle_js = 90; sendCommand('straighten'); updateTurnPreview()">Synchronizuj servo</button>
+                </div>
+                <div id="right">
+                    <div id="infrared_camera_preview">
+                        <div id="captr_infrared_placeholder"><img id="capturedInfrared" alt="Infrared" src="menewr1.jpg" width="400px"></div>
+                        <button type="button" onclick="captureInfrared(); startTimer()">Take a photo</button>
+                        <button onclick="refreshInf()">Refresh</button>
+                        <div id="progress-bar-inf">
+                            <div id="progress-inf"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script src="scripts.js">
+    </script>
+</body>
+</html>
