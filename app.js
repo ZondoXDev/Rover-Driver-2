@@ -9,6 +9,13 @@ const cors = require('cors');
 // Inicjalizacja GPIO
 const servo1 = new Gpio(21, { mode: Gpio.OUTPUT });
 const servo2 = new Gpio(20, { mode: Gpio.OUTPUT });
+// const servo_left_wing = new Gpio(##, { mode: Gpio.OUTPUT });
+// const servo_right_wing = new Gpio(##, { mode: Gpio.OUTPUT });
+const servo_crane = new Gpio(19, { mode: Gpio.OUTPUT });
+
+const motor_release_crane = new Gpio(26, { mode: Gpio.OUTPUT });
+const motor_stretch_crane = new Gpio(13, { mode: Gpio.OUTPUT });
+
 
 const led = new Gpio(17, { mode: Gpio.OUTPUT });
 const buzzer = new Gpio(16, { mode: Gpio.OUTPUT });
@@ -23,7 +30,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const mqttBroker = 'mqtt://192.168.0.19'; // Zastąp IP_RPi_4 rzeczywistym adresem IP Raspberry Pi 4
+const mqttBroker = 'mqtt://192.168.0.19'; // IP Raspberry Pi 4
 
 // Dodaj nazwę użytkownika i hasło do połączenia MQTT (jeśli są wymagane)
 const mqttOptions = {
@@ -111,6 +118,57 @@ app.post('/moveServos', (req, res) => {
   } else {
     res.status(400).json({ error: 'Invalid servo positions' });
   }
+});
+
+// SuperCargo
+app.post('/superCargo', (req, res) => {
+  const rec_operation = req.body.operation;
+
+  console.log(`Received superCargo: ${rec_operation}`);
+
+  if (rec_operation == "open"){
+    console.log("Opening SuperCargo");
+    servo1.servoWrite(angleToPulseWidth(51));
+    servo2.servoWrite(angleToPulseWidth(158));
+  }
+  else if (rec_operation == "close"){
+      console.log("Closing SuperCargo");
+      servo1.servoWrite(angleToPulseWidth(121));
+      servo2.servoWrite(angleToPulseWidth(89));
+  }
+    res.json({ success: true });
+});
+
+// Crane
+app.post('/crane', (req, res) => {
+  const rec_operation = req.body.operation;
+
+  console.log(`Received crane: ${rec_operation}`);
+
+  if (rec_operation == "up"){
+    console.log("Lifting crane");
+    servo_crane.servoWrite(angleToPulseWidth(50));
+  }
+  else if (rec_operation == "down"){
+    console.log("Lowering crane");
+    servo_crane.servoWrite(angleToPulseWidth(100));
+  }
+  else if (rec_operation == "release"){
+    console.log("Releasing line");
+    motor_release_crane.digitalWrite(1);
+    setTimeout(() => {
+      motor_release_crane.digitalWrite(0);
+    }, 50);
+  }
+  else if (rec_operation == "stretch"){
+    console.log("Releasing line");
+    motor_stretch_crane.digitalWrite(1);
+    setTimeout(() => {
+      motor_stretch_crane.digitalWrite(0);
+    }, 500);
+  }
+
+    res.json({ success: true });
 });
 
 // Obsługa żądania robienia zdjęcia

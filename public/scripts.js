@@ -174,6 +174,69 @@ let servo_angle_js = 90;
             });
         }
 
+        function superCargo(operation) {
+            let result_p = document.getElementById("result-p");
+
+            console.log(operation);
+            
+            if (operation == "open"){
+                console.log("Opening SuperCargo!");
+              }
+              else if (operation == "close"){
+                  console.log("Closing SuperCargo!");
+              }
+
+            fetch("/superCargo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ operation }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    result_p.innerHTML = "Operacja wykonana";
+                    setTimeout(() => {
+                        result_p.innerHTML = "";
+                    }, 500);
+                } else {
+                    result_p.innerHTML = "Coś się nie udało";
+                }
+            })
+            .catch(error => {
+                console.error("Wystąpił błąd:", error);
+            });
+        }
+        // crane
+        function crane(operation) {
+            let result_p = document.getElementById("result-p");
+
+            console.log(operation);
+
+            fetch("/crane", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ operation }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    result_p.innerHTML = "Operacja wykonana";
+                    setTimeout(() => {
+                        result_p.innerHTML = "";
+                    }, 500);
+                } else {
+                    result_p.innerHTML = "Coś się nie udało";
+                }
+            })
+            .catch(error => {
+                console.error("Wystąpił błąd:", error);
+            });
+        }
+
 
         function capturePhoto() {
             fetch('/capturePhoto')
