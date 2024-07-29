@@ -13,9 +13,11 @@ const servo2 = new Gpio(20, { mode: Gpio.OUTPUT });
 // const servo_right_wing = new Gpio(##, { mode: Gpio.OUTPUT });
 const servo_crane = new Gpio(19, { mode: Gpio.OUTPUT });
 
-const motor_release_crane = new Gpio(26, { mode: Gpio.OUTPUT });
-const motor_stretch_crane = new Gpio(13, { mode: Gpio.OUTPUT });
+const servo_stretcher = new Gpio(13, { mode: Gpio.OUTPUT });
+const gripper_white_leds = new Gpio(26, { mode: Gpio.OUTPUT });
 
+const relay_1 = new Gpio(5, { mode: Gpio.OUTPUT });
+const relay_2 = new Gpio(6, { mode: Gpio.OUTPUT });
 
 const led = new Gpio(17, { mode: Gpio.OUTPUT });
 const buzzer = new Gpio(16, { mode: Gpio.OUTPUT });
@@ -61,6 +63,26 @@ function angleToPulseWidth(angle) {
   // Konwersja kąta na pulseWidth
   // Zmiana w linii poniżej, dodanie "+ minPulseWidth" na końcu
   return Math.floor((angle - minAngle) / (maxAngle - minAngle) * (maxPulseWidth - minPulseWidth) + minPulseWidth);
+}
+
+function moveServoGradually(servo, startAngle, endAngle, step, delay) {
+  let currentAngle = startAngle;
+
+  // Określenie kierunku ruchu
+  if (startAngle > endAngle) {
+      step = -Math.abs(step); // Upewnij się, że krok jest ujemny
+  } else {
+      step = Math.abs(step); // Upewnij się, że krok jest dodatni
+  }
+
+  let intervalId = setInterval(() => {
+      if ((step > 0 && currentAngle <= endAngle) || (step < 0 && currentAngle >= endAngle)) {
+          servo.servoWrite(angleToPulseWidth(currentAngle));
+          currentAngle += step;
+      } else {
+          clearInterval(intervalId);
+      }
+  }, delay);
 }
 
 // Obsługa przycisków
@@ -147,25 +169,72 @@ app.post('/crane', (req, res) => {
 
   if (rec_operation == "up"){
     console.log("Lifting crane");
-    servo_crane.servoWrite(angleToPulseWidth(50));
+    // servo_crane.servoWrite(angleToPulseWidth(40));
+    moveServoGradually(servo_crane, 95, 40, 1, 20);
+    
+    setTimeout(() => {
+      moveServoGradually(servo_stretcher, 30, 115, 1, 10);
+    }, 500);
   }
   else if (rec_operation == "down"){
     console.log("Lowering crane");
-    servo_crane.servoWrite(angleToPulseWidth(100));
+    // servo_crane.servoWrite(angleToPulseWidth(30));
+
+    servo_stretcher.servoWrite(angleToPulseWidth(130));
+    
+    setTimeout(() => {
+      servo_stretcher.servoWrite(angleToPulseWidth(30));
+      setTimeout(() => {
+        moveServoGradually(servo_crane, 40, 95, 1, 20);
+        moveServoGradually(servo_stretcher, 30, 43, 1, 10);
+          setTimeout(() => {
+            moveServoGradually(servo_stretcher, 43, 40, 1, 10); // stabilizacja dolna
+              setTimeout(() => {
+                moveServoGradually(servo_stretcher, 40, 30, 1, 10); // stabilizacja dolna
+              }, 2000);
+          }, 4000);
+      }, 50);
+    }, 50);
   }
   else if (rec_operation == "release"){
     console.log("Releasing line");
-    motor_release_crane.digitalWrite(1);
-    setTimeout(() => {
-      motor_release_crane.digitalWrite(0);
-    }, 50);
+    moveServoGradually(servo_stretcher, 150, 30, 1, 10);
+    gripper_white_leds.digitalWrite(1);
   }
   else if (rec_operation == "stretch"){
     console.log("Releasing line");
-    motor_stretch_crane.digitalWrite(1);
+    moveServoGradually(servo_stretcher, 30, 150, 1, 10);
+    gripper_white_leds.digitalWrite(0);
+  }
+  else if (rec_operation == "fold"){
+    console.log("Folding gripper");
+    moveServoGradually(servo_stretcher, 115, 150, 1, 10);
+    gripper_white_leds.digitalWrite(0);
+
     setTimeout(() => {
-      motor_stretch_crane.digitalWrite(0);
+      moveServoGradually(servo_crane, 40, 85, 1, 30);
+        setTimeout(() => {
+          moveServoGradually(servo_stretcher, 150, 30, 1, 10);
+        }, 1000);
     }, 500);
+  }
+  else if (rec_operation == "unfold"){
+    moveServoGradually(servo_stretcher, 30, 150, 1, 10);
+
+    setTimeout(() => {
+      moveServoGradually(servo_crane, 85, 40, 1, 20);
+        setTimeout(() => {
+          // moveServoGradually(servo_stretcher, 150, 30, 1, 10);
+          moveServoGradually(servo_stretcher, 150, 115, 1, 10);
+          gripper_white_leds.digitalWrite(1);
+        }, 1000);
+    }, 1000);
+  }
+  else if (rec_operation == "suck") {
+    relay_2.digitalWrite(1);
+  }
+  else if (rec_operation == "unsuck") {
+    relay_2.digitalWrite(0);
   }
 
     res.json({ success: true });
