@@ -60,6 +60,7 @@
                                     <button type="button" onclick='crane("unfold")'>Crane unfold</button>
                                     <button type="button" onclick='crane("suck")'>Suck</button>
                                     <button type="button" onclick='crane("unsuck")'>Unsuck</button>
+                                    <button type="button" onclick='crane("grab")'>Grab</button>
                                     
                                     <p id="result-p"></p>
                                 </div>
@@ -94,7 +95,11 @@
                 </div>
                 <div id="right">
                     <div id="infrared_camera_preview">
-                        <div id="captr_infrared_placeholder"><img id="capturedInfrared" alt="Infrared" src="menewr1.jpg" width="400px"></div>
+                        <!-- <div id="captr_infrared_placeholder"><img id="capturedInfrared" alt="Infrared" src="menewr1.jpg" width="400px"></div> -->
+                        <div id="captr_infrared_placeholder">
+                            <canvas id="canvas" width="400px" style="border: 1px solid black;"></canvas>
+                        </div>
+
                         <button type="button" onclick="captureInfrared(); startTimer()">Take a photo</button>
                         <button onclick="refreshInf()">Refresh</button>
                         <div id="progress-bar-inf">

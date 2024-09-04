@@ -266,10 +266,49 @@ let servo_angle_js = 90;
             giveOrder(command);
             let url = "http://192.168.0.17/images/hercules/" + fileName;
             lastInfUrl = url;
-            document.getElementById('capturedInfrared').src = url;
+            loadImageWithGreenLines(url);
         }
         function refreshInf() {
-            document.getElementById('capturedInfrared').src = lastInfUrl;
+            loadImageWithGreenLines(lastInfUrl);
+        }
+        function loadImageWithGreenLines(url) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+        
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                drawGreenLines(ctx);
+            };
+        
+            img.src = url;
+        }
+        function drawGreenLines(ctx) {
+            ctx.strokeStyle = 'green';
+            ctx.lineWidth = 2;
+        
+            // Rysowanie zielonych linii
+            ctx.beginPath();
+            ctx.moveTo(408, 308); // Start górnej linii poziomej V
+            ctx.lineTo(511, 291); // Koniec górnej linii poziomej V
+            ctx.stroke();
+        
+            ctx.beginPath();
+            ctx.moveTo(425, 387); // Start dolnej linii poziomej V
+            ctx.lineTo(543, 368); // Koniec dolnej linii poziomej V
+            ctx.stroke();
+        
+            ctx.beginPath();
+            ctx.moveTo(408, 308); // Start lewej linii pionowej V
+            ctx.lineTo(425, 387); // Koniec lewej linii pionowej V
+            ctx.stroke();
+        
+            ctx.beginPath();
+            ctx.moveTo(511, 291); // Start prawej linii pionowej V
+            ctx.lineTo(543, 368); // Koniec prawej linii pionowej V
+            ctx.stroke();
         }
 
         function openPhotoVis() {

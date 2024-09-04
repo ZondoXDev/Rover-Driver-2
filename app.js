@@ -170,7 +170,7 @@ app.post('/crane', (req, res) => {
   if (rec_operation == "up"){
     console.log("Lifting crane");
     // servo_crane.servoWrite(angleToPulseWidth(40));
-    moveServoGradually(servo_crane, 95, 40, 1, 20);
+    moveServoGradually(servo_crane, 85, 40, 1, 20);
     
     setTimeout(() => {
       moveServoGradually(servo_stretcher, 30, 115, 1, 10);
@@ -185,7 +185,7 @@ app.post('/crane', (req, res) => {
     setTimeout(() => {
       servo_stretcher.servoWrite(angleToPulseWidth(30));
       setTimeout(() => {
-        moveServoGradually(servo_crane, 40, 95, 1, 20);
+        moveServoGradually(servo_crane, 40, 85, 1, 20);
         moveServoGradually(servo_stretcher, 30, 43, 1, 10);
           setTimeout(() => {
             moveServoGradually(servo_stretcher, 43, 40, 1, 10); // stabilizacja dolna
@@ -199,17 +199,17 @@ app.post('/crane', (req, res) => {
   else if (rec_operation == "release"){
     console.log("Releasing line");
     moveServoGradually(servo_stretcher, 150, 30, 1, 10);
-    gripper_white_leds.digitalWrite(1);
+    // gripper_white_leds.digitalWrite(1);
   }
   else if (rec_operation == "stretch"){
     console.log("Releasing line");
     moveServoGradually(servo_stretcher, 30, 150, 1, 10);
-    gripper_white_leds.digitalWrite(0);
+    // gripper_white_leds.digitalWrite(0);
   }
   else if (rec_operation == "fold"){
     console.log("Folding gripper");
     moveServoGradually(servo_stretcher, 115, 150, 1, 10);
-    gripper_white_leds.digitalWrite(0);
+    // gripper_white_leds.digitalWrite(0);
 
     setTimeout(() => {
       moveServoGradually(servo_crane, 40, 85, 1, 30);
@@ -226,7 +226,7 @@ app.post('/crane', (req, res) => {
         setTimeout(() => {
           // moveServoGradually(servo_stretcher, 150, 30, 1, 10);
           moveServoGradually(servo_stretcher, 150, 115, 1, 10);
-          gripper_white_leds.digitalWrite(1);
+          // gripper_white_leds.digitalWrite(1);
         }, 1000);
     }, 1000);
   }
@@ -235,6 +235,26 @@ app.post('/crane', (req, res) => {
   }
   else if (rec_operation == "unsuck") {
     relay_2.digitalWrite(0);
+  }
+  else if (rec_operation == "grab") {
+    gripper_white_leds.digitalWrite(1);
+    moveServoGradually(servo_crane, 85, 95, 1, 20);
+    setTimeout(() => {
+      // moveServoGradually(servo_stretcher, 150, 30, 1, 10);
+      // moveServoGradually(servo_stretcher, 150, 115, 1, 10);
+      relay_2.digitalWrite(1);
+      gripper_white_leds.digitalWrite(1);
+      setTimeout(() => {
+        moveServoGradually(servo_crane, 95, 40, 1, 20);
+        setTimeout(() => {
+          moveServoGradually(servo_stretcher, 30, 115, 1, 10);
+            setTimeout(() => {
+              relay_2.digitalWrite(0);
+              gripper_white_leds.digitalWrite(0);
+            }, 2000); 
+        }, 500);
+      }, 100);
+    }, 1000);
   }
 
     res.json({ success: true });
