@@ -37,7 +37,7 @@ const mqttBroker = 'mqtt://192.168.0.19'; // IP Raspberry Pi 4
 // Dodaj nazwę użytkownika i hasło do połączenia MQTT (jeśli są wymagane)
 const mqttOptions = {
   username: 'mqtt_user',
-  password: 'C8FB26FF30A0',
+  password: 'passwd',
 };
 const mqttClient = mqtt.connect(mqttBroker, mqttOptions);
 
