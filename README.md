@@ -1,6 +1,6 @@
 # Hercules Rover Control System 🚗
 
-![Hercules Rover](Hercules_rover.jpg)
+![Hercules Rover](Hercules_Rover.jpg)
 
 Control software for the **Hercules exploration rover**.
 
